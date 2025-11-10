@@ -96,5 +96,3 @@ To add a new tool or app:
 
 Apache License 2.0
 [License](https://github.com/Ricky-bruh/UniversalUpdater/blob/main/LICENSE)
-
-```
