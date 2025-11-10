@@ -1,104 +1,121 @@
+// updater.cpp
+// Updater for Windows
+// Currently updates: all winget, chocolatey, scoop packages, python/pip, nodejs/npm, rust/cargo, go modules, vscode, git, browsers, steam, epic games launcher, discord, spotify.
+// Author: Ricky-Bruh
+// 
+// (https://github.com/Ricky-bruh/UniversalUpdater)
+// License: Apache License 2.0 (https://raw.githubusercontent.com/Ricky-bruh/UniversalUpdater/refs/heads/main/LICENSE)
+
 #include <iostream>
 #include <cstdlib>
 #include <windows.h>
 
-bool user_accept(const std::string& message) {
+using namespace std;
+
+// Function to ask user before running an update
+bool askUser(const string& name) {
+    cout << "\nDo you want to update " << name << "? (Y/N): ";
     char choice;
-    std::cout << message << " (y/n): ";
-    std::cin >> choice;
-    return (choice == 'y' || choice == 'Y');
+    cin >> choice;
+    return (choice == 'Y' || choice == 'y');
+}
+
+// Function to execute a command and show feedback
+void execute(const string& description, const string& command) {
+    cout << "\n=== " << description << " ===" << endl;
+    int result = system(command.c_str());
+    if (result == 0)
+        cout << "[SUCCESS] " << description << " completed." << endl;
+    else
+        cout << "[ERROR] " << description << " failed with code " << result << "." << endl;
 }
 
 int main() {
-    std::cout << "This program will update multiple programs on your PC.\n";
+    cout << "===== Universal Windows Updater =====" << endl;
+    cout << "This program will help you update most apps, languages, and tools on your PC." << endl;
+    cout << "Each section will ask for confirmation before running.\n" << endl;
+    system("pause");
 
-    // --- Winget apps ---
-    if (user_accept("Do you want to update all Winget apps and accept source/package agreements?")) {
-        std::cout << "Updating Winget apps..." << std::endl;
-        system("winget upgrade --all --accept-source-agreements --accept-package-agreements");
-    } else { std::cout << "Skipped Winget updates.\n"; }
+    // WINGET
+    if (askUser("Winget packages"))
+        execute("Updating all Winget packages", 
+                "winget upgrade --all --accept-source-agreements --accept-package-agreements");
 
-    // --- Chocolatey apps ---
-    if (user_accept("Do you want to update all Chocolatey apps?")) {
-        std::cout << "Updating Chocolatey apps..." << std::endl;
-        system("choco upgrade all -y");
-    } else { std::cout << "Skipped Chocolatey updates.\n"; }
+    // CHOCOLATEY
+    if (askUser("Chocolatey packages"))
+        execute("Updating all Chocolatey packages", 
+                "choco upgrade all -y");
 
-    // --- Scoop apps ---
-    if (user_accept("Do you want to update all Scoop apps?")) {
-        std::cout << "Updating Scoop apps..." << std::endl;
-        system("scoop update *");
-    } else { std::cout << "Skipped Scoop updates.\n"; }
+    // SCOOP
+    if (askUser("Scoop packages"))
+        execute("Updating Scoop and all apps", 
+                "scoop update *");
 
-    // --- Python itself ---
-    if (user_accept("Do you want to update Python via Winget?")) {
-        std::cout << "Updating Python..." << std::endl;
-        system("winget upgrade Python.Python.3 --accept-source-agreements --accept-package-agreements");
-    } else { std::cout << "Skipped Python update.\n"; }
+    // PYTHON
+    if (askUser("Python and PIP packages")) {
+        execute("Updating Python", "winget upgrade Python.Python.3 --accept-source-agreements --accept-package-agreements");
+        execute("Upgrading pip", "python -m pip install --upgrade pip");
+        execute("Listing outdated packages", "python -m pip list --outdated --format=freeze > outdated.txt");
+        execute("Updating all PIP packages", "for /F \"tokens=1 delims==\" %i in (outdated.txt) do python -m pip install --upgrade %i");
+        execute("Cleaning temporary file", "del outdated.txt");
+    }
 
-    // --- Python packages via pip ---
-    if (user_accept("Do you want to update all Python packages via pip?")) {
-        std::cout << "Updating pip..." << std::endl;
-        system("python -m pip install --upgrade pip");
-        std::cout << "Checking outdated packages..." << std::endl;
-        system("python -m pip list --outdated --format=freeze > outdated.txt");
-        std::cout << "Updating outdated packages..." << std::endl;
-        system("for /F \"tokens=1 delims==\" %i in (outdated.txt) do python -m pip install --upgrade %i");
-        system("del outdated.txt");
-    } else { std::cout << "Skipped Python package updates.\n"; }
+    // NODEJS + NPM
+    if (askUser("Node.js and NPM packages")) {
+        execute("Updating Node.js", "winget upgrade OpenJS.NodeJS --accept-source-agreements --accept-package-agreements");
+        execute("Updating NPM itself", "npm install -g npm");
+        execute("Updating all global NPM packages", "npm update -g");
+    }
 
-    // --- Node.js & NPM ---
-    if (user_accept("Do you want to update Node.js and all global NPM packages?")) {
-        std::cout << "Updating Node.js..." << std::endl;
-        system("winget upgrade OpenJS.NodeJS --accept-source-agreements --accept-package-agreements");
-        std::cout << "Updating global NPM packages..." << std::endl;
-        system("npm install -g npm");
-        system("npm update -g");
-    } else { std::cout << "Skipped Node.js/NPM updates.\n"; }
+    // RUST + CARGO
+    if (askUser("Rust and Cargo packages")) {
+        execute("Updating Rust toolchain", "rustup update");
+        execute("Updating Cargo packages", "cargo install-update -a");
+    }
 
-    // --- Rust & Cargo ---
-    if (user_accept("Do you want to update Rust and all Cargo packages?")) {
-        std::cout << "Updating Rust..." << std::endl;
-        system("rustup update");
-        std::cout << "Updating Cargo packages..." << std::endl;
-        system("cargo install-update -a"); // requires cargo-update
-    } else { std::cout << "Skipped Rust/Cargo updates.\n"; }
+    // GO
+    if (askUser("Go and its modules")) {
+        execute("Updating Go", "winget upgrade GoLang.Go --accept-source-agreements --accept-package-agreements");
+        execute("Updating all Go modules", "go get -u ./...");
+    }
 
-    // --- Go ---
-    if (user_accept("Do you want to update Go packages?")) {
-        std::cout << "Updating Go tools..." << std::endl;
-        system("go install all@latest");
-    } else { std::cout << "Skipped Go updates.\n"; }
+    // VSCODE
+    if (askUser("Visual Studio Code"))
+        execute("Updating Visual Studio Code", 
+                "winget upgrade Microsoft.VisualStudioCode --accept-source-agreements --accept-package-agreements");
 
-    // --- VS Code extensions ---
-    if (user_accept("Do you want to update all VS Code extensions?")) {
-        std::cout << "Updating VS Code extensions..." << std::endl;
-        system("for /F \"tokens=*\" %i in ('code --list-extensions') do code --install-extension %i --force");
-    } else { std::cout << "Skipped VS Code extensions updates.\n"; }
+    // GIT
+    if (askUser("Git"))
+        execute("Updating Git", 
+                "winget upgrade Git.Git --accept-source-agreements --accept-package-agreements");
 
-    // --- Git ---
-    if (user_accept("Do you want to update Git?")) {
-        std::cout << "Updating Git..." << std::endl;
-        system("winget upgrade Git.Git --accept-source-agreements --accept-package-agreements");
-    } else { std::cout << "Skipped Git update.\n"; }
+    // BROWSERS
+    if (askUser("all web browsers")) {
+        execute("Updating Google Chrome", "winget upgrade Google.Chrome --accept-source-agreements --accept-package-agreements");
+        execute("Updating Mozilla Firefox", "winget upgrade Mozilla.Firefox --accept-source-agreements --accept-package-agreements");
+        execute("Updating Microsoft Edge", "winget upgrade Microsoft.Edge --accept-source-agreements --accept-package-agreements");
+        execute("Updating Opera", "winget upgrade Opera.Opera --accept-source-agreements --accept-package-agreements");
+        execute("Updating Brave Browser", "winget upgrade Brave.Brave --accept-source-agreements --accept-package-agreements");
+    }
 
-    // --- Browsers ---
-    if (user_accept("Do you want to update browsers (Chrome, Edge, Firefox)?")) {
-        std::cout << "Updating browsers..." << std::endl;
-        system("winget upgrade Google.Chrome --accept-source-agreements --accept-package-agreements");
-        system("winget upgrade Mozilla.Firefox --accept-source-agreements --accept-package-agreements");
-        system("winget upgrade Microsoft.Edge --accept-source-agreements --accept-package-agreements");
-    } else { std::cout << "Skipped browser updates.\n"; }
+    // STEAM
+    if (askUser("Steam"))
+        execute("Updating Steam", "winget upgrade Valve.Steam --accept-source-agreements --accept-package-agreements");
 
-    // --- Games & apps (Steam, Epic, Discord, Spotify) ---
-    if (user_accept("Do you want to update Steam, Epic Games Launcher, Discord, and Spotify?")) {
-        std::cout << "Updating apps..." << std::endl;
-        system("winget upgrade Valve.Steam --accept-source-agreements --accept-package-agreements");
-        system("winget upgrade EpicGames.EpicGamesLauncher --accept-source-agreements --accept-package-agreements");
-        system("winget upgrade Discord.Discord --accept-source-agreements --accept-package-agreements");
-        system("winget upgrade Spotify.Spotify --accept-source-agreements --accept-package-agreements");
-    } else { std::cout << "Skipped games/apps updates.\n"; }
+    // EPIC GAMES LAUNCHER
+    if (askUser("Epic Games Launcher"))
+        execute("Updating Epic Games Launcher", "winget upgrade EpicGames.EpicGamesLauncher --accept-source-agreements --accept-package-agreements");
 
-    std::cout << "All selected updates finished!" << std::endl;
+    // DISCORD
+    if (askUser("Discord"))
+        execute("Updating Discord", "winget upgrade Discord.Discord --accept-source-agreements --accept-package-agreements");
+
+    // SPOTIFY
+    if (askUser("Spotify"))
+        execute("Updating Spotify", "winget upgrade Spotify.Spotify --accept-source-agreements --accept-package-agreements");
+
+    cout << "\nAll selected updates completed." << endl;
+    cout << "Press any key to exit..." << endl;
+    system("pause");
     return 0;
 }

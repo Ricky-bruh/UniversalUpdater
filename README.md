@@ -34,11 +34,11 @@ It currently supports:
 
 ## 🛠️ How to Build
 1. Open your C++ IDE (Visual Studio, Code::Blocks, etc.) or terminal.  
-2. Add `main.cpp` (the main program file).  
+2. Add `updater.cpp` (the main program file).  
 3. Compile the program:
     ```sh
    cl updater.cpp /EHsc   # Visual Studio
    g++ updater.cpp -o updater.exe  # MinGW
     ```
 Run the executable:
-    `main.exe`
+    `updater.exe`
