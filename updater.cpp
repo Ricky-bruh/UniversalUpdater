@@ -25,17 +25,17 @@ void execute(const string& description, const string& command) {
     cout << "\n=== " << description << " ===" << endl;
     int result = system(command.c_str());
     if (result == 0)
-        cout << "[SUCCESS] " << description << " completed." << endl;
+    cout << "[SUCCESS] " << description << " completed." << endl;
     else
-        cout << "[ERROR] " << description << " failed with code " << result << "." << endl;
-}
-
-int main() {
-    cout << "===== Universal Windows Updater =====" << endl;
-    cout << "This program will help you update most apps, languages, and tools on your PC." << endl;
-    cout << "Each section will ask for confirmation before running.\n" << endl;
+    cout << "[ERROR] " << description << " failed with code " << result << "." << endl;
+    }
+    
+    int main() {
+        cout << "===== Universal Updater =====" << endl;
+        cout << "This program will help you update most apps, languages, and tools on your PC." << endl;
+        cout << "Each section will ask for confirmation before running.\n" << endl;
     system("pause");
-
+    
     // WINGET
     if (askUser("Winget packages"))
         execute("Updating all Winget packages", 
