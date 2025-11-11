@@ -1,4 +1,4 @@
-# All-in-One Windows Updater
+# All-in-One Updater
 
 A C++ program that helps you update **most applications, package managers, programming languages, and development tools** on a Windows PC.  
 
@@ -41,12 +41,7 @@ It supports:
    ```sh
    cl updater.cpp /EHsc   # Visual Studio
    g++ updater.cpp -o updater.exe  # MinGW
-<<<<<<< HEAD
-    ```
-Run the executable:
-    `updater.exe`
-=======
-```
+   ```
 
 4. Run the executable as Administrator:
 
@@ -60,7 +55,6 @@ Run the executable:
 
 1. The program prompts the user for each type of update (Winget, Chocolatey, Python, etc.).
 2. If the user agrees:
-
    * CLI commands are executed to update the software.
    * For Winget, the program automatically accepts the source and package agreements.
 3. Python packages are upgraded individually using pip.
@@ -70,21 +64,10 @@ Run the executable:
 
 ---
 
-## ✨ Extending the Program
-
-To add a new tool or app:
-
-1. Add a new `if (user_accept(...)) { system(...); }` block.
-2. Use the appropriate CLI update command for the tool.
-3. Make sure to test it with admin privileges if required.
-
----
-
 ## ⚠️ Limitations
 
 * Tools/apps without a CLI updater cannot be updated automatically.
 * Some apps may require manual interaction or a restart.
-* Portable apps won’t be updated unless you implement a custom downloader.
 * Always run the program **as Administrator** for system-level updates.
 
 ---
@@ -92,13 +75,11 @@ To add a new tool or app:
 ## 💡 Tips
 
 * Can be scheduled with **Task Scheduler** to run periodically.
-* Works best with tools installed via package managers (Winget, Chocolatey, Scoop).
-* Keep your CLI tools (Python, Node.js, Rust, Go) installed and in PATH for automatic detection.
 
 ---
 
 ## License
 
-Apache License 2.0
+Apache License 2.0.
 [License](https://github.com/Ricky-bruh/UniversalUpdater/blob/main/LICENSE)
->>>>>>> 531dc48ae74d8f50c745c4f8143d61ea55692953
+```
